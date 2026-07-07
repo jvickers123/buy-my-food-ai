@@ -370,9 +370,25 @@ function mockReply(input: string): string {
 }
 
 /* ============ 7. Final order ============ */
+// Cap how many items we actually push to Tesco so demos stay quick. Set to
+// Infinity to send the whole basket.
+const DEMO_MAX_ITEMS = 3;
+
+type CheckoutStatus = "idle" | "running" | "done" | "error";
+
+interface AddedLine {
+  requested: string;
+  matched: string | null;
+  added: boolean;
+}
+
 export function Order({ plan }: ScreenProps) {
   const basket = useMemo(() => buildBasket(plan), [plan]);
-  const [ordered, setOrdered] = useState(false);
+  const [status, setStatus] = useState<CheckoutStatus>("idle");
+  const [logs, setLogs] = useState<string[]>([]);
+  const [basketUrl, setBasketUrl] = useState<string | null>(null);
+  const [added, setAdded] = useState<AddedLine[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const mealCount = plan.acceptedMealIds.length;
   const nights = nightsEatingIn(plan);
   const est = (basket.length * 2.4 + 6).toFixed(2); // playful mock total
@@ -381,6 +397,60 @@ export function Order({ plan }: ScreenProps) {
     (acc[l.sourceLabel] ||= []).push(l);
     return acc;
   }, {});
+
+  const sendToTesco = async () => {
+    setStatus("running");
+    setLogs([]);
+    setError(null);
+    setAdded([]);
+    setBasketUrl(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: basket
+            .slice(0, DEMO_MAX_ITEMS)
+            .map((l) => ({ name: l.name, qty: l.qty })),
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error(`Server responded ${res.status}`);
+
+      // Parse the Server-Sent Events stream chunk by chunk.
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() ?? "";
+        for (const frame of frames) {
+          const eventLine = frame.split("\n").find((l) => l.startsWith("event:"));
+          const dataLine = frame.split("\n").find((l) => l.startsWith("data:"));
+          if (!dataLine) continue;
+          const event = eventLine ? eventLine.slice(6).trim() : "message";
+          const data = JSON.parse(dataLine.slice(5).trim());
+          if (event === "progress") {
+            setLogs((prev) => [...prev, data.message]);
+          } else if (event === "done") {
+            setBasketUrl(data.basketUrl);
+            setAdded(data.added ?? []);
+            setStatus("done");
+          } else if (event === "error") {
+            setError(data.error);
+            setStatus("error");
+          }
+        }
+      }
+      // Stream ended without a terminal event.
+      setStatus((s) => (s === "running" ? "error" : s));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setStatus("error");
+    }
+  };
 
   return (
     <div className="screen screen-pad fade-in">
@@ -393,6 +463,38 @@ export function Order({ plan }: ScreenProps) {
           <span>{basket.length} items</span>
         </div>
       </div>
+
+      {(status === "running" || logs.length > 0) && (
+        <div className="checkout-log">
+          {logs.map((line, i) => (
+            <div key={i} className="checkout-log-line">
+              {status === "running" && i === logs.length - 1 ? "▸ " : "· "}
+              {line}
+            </div>
+          ))}
+          {status === "running" && logs.length === 0 && (
+            <div className="checkout-log-line">▸ Starting up the browser…</div>
+          )}
+        </div>
+      )}
+
+      {status === "error" && error && (
+        <div className="checkout-error">Couldn’t finish: {error}</div>
+      )}
+
+      {status === "done" && added.length > 0 && (
+        <div className="list" style={{ marginTop: 12 }}>
+          {added.map((a, i) => (
+            <div key={i} className="row">
+              <span className="body">
+                <strong>{a.requested}</strong>
+                <small>{a.matched ? `→ ${a.matched}` : "no match found"}</small>
+              </span>
+              <span className="qty">{a.added ? "✓" : "—"}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {Object.entries(byMeal).map(([label, lines]) => (
         <div key={label}>
@@ -409,10 +511,18 @@ export function Order({ plan }: ScreenProps) {
       ))}
 
       <div className="footer">
-        {ordered ? (
-          <button className="btn secondary" disabled>✓ Sent to your Tesco basket</button>
+        {status === "done" && basketUrl ? (
+          <a className="btn" href={basketUrl} target="_blank" rel="noreferrer">
+            Open your Tesco basket →
+          </a>
         ) : (
-          <button className="btn" onClick={() => setOrdered(true)}>Send {basket.length} items to Tesco →</button>
+          <button className="btn" onClick={sendToTesco} disabled={status === "running"}>
+            {status === "running"
+              ? "Adding to Tesco…"
+              : status === "error"
+              ? "Try again →"
+              : `Send ${Math.min(basket.length, DEMO_MAX_ITEMS)} items to Tesco →`}
+          </button>
         )}
       </div>
     </div>

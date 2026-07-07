@@ -15,7 +15,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["one-pot", "hearty"],
     nutrition: { kcal: 620, protein: 28, carbs: 54, fat: 30 },
-    ingredients: ["Chorizo 200g", "Butter beans 2 tins", "Chopped tomatoes 2 tins", "Crusty bread 1 loaf", "Spinach 1 bag"],
+    ingredients: [
+      { name: "Chorizo", qty: 200, unit: "g", scalable: true },
+      { name: "Butter beans", qty: 2, unit: "tin", scalable: true },
+      { name: "Chopped tomatoes", qty: 2, unit: "tin", scalable: true },
+      { name: "Crusty bread", qty: 1, unit: "loaf", scalable: false },
+      { name: "Spinach", qty: 1, unit: "pack", scalable: true },
+    ],
   },
   {
     id: "m2",
@@ -26,7 +32,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["veggie", "traybake"],
     nutrition: { kcal: 540, protein: 24, carbs: 38, fat: 32 },
-    ingredients: ["Halloumi 2 blocks", "Peppers 3", "Courgette 2", "Red onion 2", "Couscous 300g"],
+    ingredients: [
+      { name: "Halloumi", qty: 2, unit: "block", scalable: true },
+      { name: "Peppers", qty: 3, unit: "unit", scalable: true },
+      { name: "Courgette", qty: 2, unit: "unit", scalable: true },
+      { name: "Red onion", qty: 2, unit: "unit", scalable: true },
+      { name: "Couscous", qty: 300, unit: "g", scalable: true },
+    ],
   },
   {
     id: "m3",
@@ -37,7 +49,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["quick", "spicy"],
     nutrition: { kcal: 680, protein: 42, carbs: 62, fat: 26 },
-    ingredients: ["Chicken thighs 600g", "Green curry paste 1 jar", "Coconut milk 2 tins", "Jasmine rice 500g", "Green beans 200g"],
+    ingredients: [
+      { name: "Chicken thighs", qty: 600, unit: "g", scalable: true },
+      { name: "Green curry paste", qty: 1, unit: "jar", scalable: false },
+      { name: "Coconut milk", qty: 2, unit: "tin", scalable: true },
+      { name: "Jasmine rice", qty: 500, unit: "g", scalable: true },
+      { name: "Green beans", qty: 200, unit: "g", scalable: true },
+    ],
   },
   {
     id: "m4",
@@ -48,7 +66,11 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["veggie", "quick"],
     nutrition: { kcal: 590, protein: 21, carbs: 78, fat: 22 },
-    ingredients: ["Spaghetti 500g", "Pecorino 200g", "Black pepper 1 jar"],
+    ingredients: [
+      { name: "Spaghetti", qty: 500, unit: "g", scalable: true },
+      { name: "Pecorino", qty: 200, unit: "g", scalable: true },
+      { name: "Black pepper", qty: 1, unit: "jar", scalable: false },
+    ],
   },
   {
     id: "m5",
@@ -59,7 +81,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["fish", "fresh"],
     nutrition: { kcal: 560, protein: 34, carbs: 48, fat: 24 },
-    ingredients: ["White fish fillets 4", "Tortillas 8", "Red cabbage 1", "Lime 3", "Chipotle mayo 1 jar"],
+    ingredients: [
+      { name: "White fish fillets", qty: 4, unit: "unit", scalable: true },
+      { name: "Tortillas", qty: 8, unit: "unit", scalable: true },
+      { name: "Red cabbage", qty: 1, unit: "unit", scalable: true },
+      { name: "Lime", qty: 3, unit: "unit", scalable: true },
+      { name: "Chipotle mayo", qty: 1, unit: "jar", scalable: false },
+    ],
   },
   {
     id: "m6",
@@ -70,7 +98,13 @@ export const MEALS: Meal[] = [
     servings: 6,
     tags: ["hearty", "batch"],
     nutrition: { kcal: 720, protein: 38, carbs: 44, fat: 42 },
-    ingredients: ["Lamb mince 750g", "Aubergine 3", "Potatoes 1kg", "Bechamel 1 tub", "Cinnamon 1 jar"],
+    ingredients: [
+      { name: "Lamb mince", qty: 750, unit: "g", scalable: true },
+      { name: "Aubergine", qty: 3, unit: "unit", scalable: true },
+      { name: "Potatoes", qty: 1, unit: "kg", scalable: true },
+      { name: "Bechamel", qty: 1, unit: "tub", scalable: true },
+      { name: "Cinnamon", qty: 1, unit: "jar", scalable: false },
+    ],
   },
   {
     id: "m7",
@@ -81,7 +115,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["fish", "quick"],
     nutrition: { kcal: 610, protein: 40, carbs: 52, fat: 24 },
-    ingredients: ["Salmon fillets 4", "Miso paste 1 tub", "Sushi rice 500g", "Tenderstem broccoli 2 packs", "Cucumber 1"],
+    ingredients: [
+      { name: "Salmon fillets", qty: 4, unit: "unit", scalable: true },
+      { name: "Miso paste", qty: 1, unit: "tub", scalable: false },
+      { name: "Sushi rice", qty: 500, unit: "g", scalable: true },
+      { name: "Tenderstem broccoli", qty: 2, unit: "pack", scalable: true },
+      { name: "Cucumber", qty: 1, unit: "unit", scalable: true },
+    ],
   },
   {
     id: "m8",
@@ -92,7 +132,13 @@ export const MEALS: Meal[] = [
     servings: 4,
     tags: ["veggie", "quick", "kids"],
     nutrition: { kcal: 520, protein: 22, carbs: 58, fat: 20 },
-    ingredients: ["Tortillas 8", "Black beans 2 tins", "Cheddar 300g", "Sweetcorn 1 tin", "Salsa 1 jar"],
+    ingredients: [
+      { name: "Tortillas", qty: 8, unit: "unit", scalable: true },
+      { name: "Black beans", qty: 2, unit: "tin", scalable: true },
+      { name: "Cheddar", qty: 300, unit: "g", scalable: true },
+      { name: "Sweetcorn", qty: 1, unit: "tin", scalable: true },
+      { name: "Salsa", qty: 1, unit: "jar", scalable: false },
+    ],
   },
 ];
 

@@ -13,6 +13,36 @@ export interface Nutrition {
   fat: number; // grams
 }
 
+// Units we understand. Weight/volume pairs normalise to a base; the rest are
+// count-based ("buy N whole things") and never sub-divide.
+export type Unit =
+  | "g"
+  | "kg"
+  | "ml"
+  | "l"
+  | "tin"
+  | "pack"
+  | "block"
+  | "loaf"
+  | "jar"
+  | "tub"
+  | "unit";
+
+// A single structured ingredient line on a meal.
+export interface Ingredient {
+  name: string; // canonical name — must match across meals to aggregate, e.g. "Tortillas"
+  qty: number; // numeric quantity, in `unit`
+  unit: Unit;
+  scalable: boolean; // scale with servings? spices/jars usually false
+}
+
+// The clean, deduped, API-ready ingredient shape produced after aggregation.
+export interface AggregatedIngredient {
+  name: string;
+  qty: number;
+  unit: Unit;
+}
+
 export interface Meal {
   id: string;
   name: string;
@@ -22,7 +52,7 @@ export interface Meal {
   servings: number;
   tags: string[]; // e.g. ["veggie", "quick"]
   nutrition: Nutrition;
-  ingredients: string[]; // maps into the final basket
+  ingredients: Ingredient[]; // structured; maps into the final basket
 }
 
 export interface EssentialItem {

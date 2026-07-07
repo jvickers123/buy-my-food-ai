@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import SwipeCard from "./SwipeCard";
 import { MEALS, NIGHTS, SHOP_TRAITS, SHOP_PERSONA } from "./data";
 import { buildBasket, nightsEatingIn } from "./basket";
+import { rankMeals, resolveContext } from "./suggestions";
 import type { PlanState, RegularItem, ChatMessage } from "./types";
 
 // Shared props: each screen reads/updates the plan and calls next() to advance.
@@ -198,12 +199,73 @@ export function HouseholdScreen({ plan, setPlan, next }: ScreenProps) {
   );
 }
 
+/* ============ 2b. Inspiration — weather / season / event context ============ */
+export function Inspiration({ plan, setPlan, next }: ScreenProps) {
+  // Seed the context on first view (lazy-seed pattern, like Calendar's nights).
+  const context = plan.context ?? resolveContext();
+  if (!plan.context) {
+    setPlan((p) => (p.context ? p : { ...p, context }));
+  }
+
+  const { weather, season, event } = context;
+  const seasonLabel = season.charAt(0).toUpperCase() + season.slice(1);
+
+  // Preview the top few meals this context surfaces first.
+  const topPicks = useMemo(() => rankMeals(MEALS, context).slice(0, 3), [context]);
+
+  return (
+    <div className="screen screen-pad fade-in">
+      <span className="eyebrow">Before you swipe</span>
+      <h1 className="title">We checked what’s happening this week</h1>
+      <p className="sub">Weather, season and what’s on — so the meals we show you actually fit the moment.</p>
+
+      <motion.div
+        className="persona"
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 220, damping: 16 }}
+      >
+        <div className="persona-emoji">{weather.emoji}</div>
+        <div className="persona-label">{weather.descriptor} · {weather.tempC}°C</div>
+        <p>{seasonLabel} · {event ? event.name : "no big events this week"}</p>
+      </motion.div>
+
+      {event && (
+        <div className="callout">
+          <span className="ico">{event.emoji}</span>
+          <span className="txt">{event.blurb}</span>
+        </div>
+      )}
+
+      <div className="group-label">So we’ve bumped these to the top</div>
+      <div className="list">
+        {topPicks.map((m) => (
+          <div key={m.id} className="row">
+            <span className="body"><strong>{m.name}</strong><small>{m.tags.slice(0, 3).join(" · ")}</small></span>
+          </div>
+        ))}
+      </div>
+
+      <div className="footer">
+        <button className="btn" onClick={next}>Sounds good — let’s swipe</button>
+      </div>
+    </div>
+  );
+}
+
 /* ============ 3. Swipe deck ============ */
 export function Swipe({ plan, setPlan, next }: ScreenProps) {
   const [cursor, setCursor] = useState(0);
 
+  // Order the deck by how well each meal fits this week's context, so the most
+  // fitting meals surface first. Falls back to a fresh resolve if unseeded.
+  const deck = useMemo(
+    () => rankMeals(MEALS, plan.context ?? resolveContext()),
+    [plan.context]
+  );
+
   const decide = (accepted: boolean) => {
-    const meal = MEALS[cursor];
+    const meal = deck[cursor];
     if (!meal) return;
     if (accepted) {
       setPlan((p) =>
@@ -217,16 +279,21 @@ export function Swipe({ plan, setPlan, next }: ScreenProps) {
 
   // Trigger a fling on the top card from the round buttons.
   const [flingSignal, setFlingSignal] = useState<{ dir: 1 | -1; at: number } | null>(null);
-  const remaining = MEALS.length - cursor;
+  const remaining = deck.length - cursor;
   const accepted = plan.acceptedMealIds.length;
+  const ctx = plan.context ?? resolveContext();
 
   return (
     <div className="screen fade-in" style={{ paddingBottom: 12 }}>
-      <span className="eyebrow">Step 3 · This week’s meals</span>
+      <span className="eyebrow">Step 4 · This week’s meals</span>
       <h1 className="title" style={{ fontSize: 23, marginBottom: 2 }}>Swipe what you fancy</h1>
       <p className="sub" style={{ marginBottom: 8 }}>
         <b style={{ color: "var(--green)" }}>Right = yes please</b>, left = not this week.
       </p>
+
+      <div className="chips" style={{ marginBottom: 8 }}>
+        <span className="chip on">{ctx.weather.emoji} {ctx.weather.descriptor} picks first</span>
+      </div>
 
       <div className="deck-wrap">
         <div className="deck">
@@ -238,7 +305,7 @@ export function Swipe({ plan, setPlan, next }: ScreenProps) {
               </div>
             </div>
           )}
-          {MEALS.map((meal, i) => {
+          {deck.map((meal, i) => {
             const depth = i - cursor;
             if (depth < 0 || depth > 2) return null;
             return (
@@ -292,7 +359,7 @@ export function Regulars({ plan, setPlan, next }: ScreenProps) {
 
   return (
     <div className="screen screen-pad fade-in">
-      <span className="eyebrow">Step 4 · Your regulars</span>
+      <span className="eyebrow">Step 5 · Your regulars</span>
       <h1 className="title">The things you always buy</h1>
       <p className="sub">Groceries and household essentials we spotted across your past orders. Tap to add or drop any.</p>
 
@@ -335,7 +402,7 @@ export function Calendar({ plan, setPlan, next }: ScreenProps) {
 
   return (
     <div className="screen screen-pad fade-in">
-      <span className="eyebrow">Step 5 · Your week</span>
+      <span className="eyebrow">Step 6 · Your week</span>
       <h1 className="title">We checked your calendar</h1>
       <div className="callout">
         <span className="ico">📅</span>
@@ -388,7 +455,7 @@ export function Chat({ plan, setPlan, next }: ScreenProps) {
 
   return (
     <div className="screen fade-in" style={{ paddingBottom: 12 }}>
-      <span className="eyebrow">Step 6 · Final tweaks</span>
+      <span className="eyebrow">Step 7 · Final tweaks</span>
       <h1 className="title" style={{ fontSize: 23 }}>Anything else?</h1>
 
       <div className="chat-scroll">

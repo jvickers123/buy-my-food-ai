@@ -6,6 +6,7 @@ import {
   Upload,
   ShopProfile,
   HouseholdScreen,
+  Inspiration,
   Swipe,
   Regulars,
   Calendar,
@@ -20,11 +21,13 @@ const initialPlan: PlanState = {
   nights: [],
   chat: [],
   regulars: REGULARS.map((r) => ({ ...r })),
+  context: null,
 };
 
 // Ordered flow. Welcome is step 0 and sits outside the progress bar count.
-// ShopProfile (the delight screen) sits right after Upload.
-const STEPS = [Welcome, Upload, ShopProfile, HouseholdScreen, Swipe, Regulars, Calendar, Chat, Order];
+// ShopProfile (the delight screen) sits right after Upload; Inspiration
+// (weather/season/event context) sits right before the Swipe deck.
+const STEPS = [Welcome, Upload, ShopProfile, HouseholdScreen, Inspiration, Swipe, Regulars, Calendar, Chat, Order];
 
 export default function App() {
   const [step, setStep] = useState(0);

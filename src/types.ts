@@ -90,6 +90,32 @@ export interface RegularItem {
   selected: boolean; // pre-add their regulars to the plan
 }
 
+export type Season = "spring" | "summer" | "autumn" | "winter";
+
+// A snapshot of the weather we (pretend to) fetch to inspire meals.
+export interface WeatherContext {
+  condition: string; // "sunny", "rainy", ...
+  tempC: number;
+  emoji: string;
+  descriptor: string; // human phrase, e.g. "hot & bright"
+}
+
+// A festival / major event happening around now, if any.
+export interface EventContext {
+  name: string; // "August Bank Holiday"
+  emoji: string;
+  blurb: string;
+}
+
+// The resolved context that inspires (re-ranks) meal suggestions. `themeTags`
+// is the derived set of meal tags this context favours.
+export interface SuggestionContext {
+  weather: WeatherContext;
+  season: Season;
+  event: EventContext | null;
+  themeTags: string[];
+}
+
 // The single object we thread through the whole journey.
 export interface PlanState {
   household: Household;
@@ -98,4 +124,5 @@ export interface PlanState {
   nights: CalendarNight[];
   chat: ChatMessage[];
   regulars: RegularItem[];
+  context: SuggestionContext | null; // seeded on the Inspiration screen
 }

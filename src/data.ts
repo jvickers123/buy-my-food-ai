@@ -1,4 +1,4 @@
-import type { Meal, CalendarNight, ShopTrait, RegularItem } from "./types";
+import type { Meal, CalendarNight, ShopTrait, RegularItem, SuggestionContext } from "./types";
 
 // Mock meal deck. Photos are Unsplash source URLs (food photography) so the
 // cards read like Hello Fresh without shipping binary assets.
@@ -13,7 +13,7 @@ export const MEALS: Meal[] = [
     image: img("1455619452474-d2be8b1e70cd"),
     minutes: 30,
     servings: 4,
-    tags: ["one-pot", "hearty"],
+    tags: ["one-pot", "hearty", "warming", "comfort"],
     nutrition: { kcal: 620, protein: 28, carbs: 54, fat: 30 },
     ingredients: [
       { name: "Chorizo", qty: 200, unit: "g", scalable: true },
@@ -30,7 +30,7 @@ export const MEALS: Meal[] = [
     image: img("1540189549336-e6e99c3679fe"),
     minutes: 35,
     servings: 4,
-    tags: ["veggie", "traybake"],
+    tags: ["veggie", "traybake", "summery", "bbq", "fresh"],
     nutrition: { kcal: 540, protein: 24, carbs: 38, fat: 32 },
     ingredients: [
       { name: "Halloumi", qty: 2, unit: "block", scalable: true },
@@ -47,7 +47,7 @@ export const MEALS: Meal[] = [
     image: img("1455619452474-d2be8b1e70cd"),
     minutes: 30,
     servings: 4,
-    tags: ["quick", "spicy"],
+    tags: ["quick", "spicy", "light"],
     nutrition: { kcal: 680, protein: 42, carbs: 62, fat: 26 },
     ingredients: [
       { name: "Chicken thighs", qty: 600, unit: "g", scalable: true },
@@ -64,7 +64,7 @@ export const MEALS: Meal[] = [
     image: img("1551892374-ecf8754cf8b0"),
     minutes: 15,
     servings: 4,
-    tags: ["veggie", "quick"],
+    tags: ["veggie", "quick", "light"],
     nutrition: { kcal: 590, protein: 21, carbs: 78, fat: 22 },
     ingredients: [
       { name: "Spaghetti", qty: 500, unit: "g", scalable: true },
@@ -79,7 +79,7 @@ export const MEALS: Meal[] = [
     image: img("1565299624946-b28f40a0ae38"),
     minutes: 25,
     servings: 4,
-    tags: ["fish", "fresh"],
+    tags: ["fish", "fresh", "summery", "bbq", "light"],
     nutrition: { kcal: 560, protein: 34, carbs: 48, fat: 24 },
     ingredients: [
       { name: "White fish fillets", qty: 4, unit: "unit", scalable: true },
@@ -96,7 +96,7 @@ export const MEALS: Meal[] = [
     image: img("1544025162-d76694265947"),
     minutes: 70,
     servings: 6,
-    tags: ["hearty", "batch"],
+    tags: ["hearty", "batch", "warming", "comfort"],
     nutrition: { kcal: 720, protein: 38, carbs: 44, fat: 42 },
     ingredients: [
       { name: "Lamb mince", qty: 750, unit: "g", scalable: true },
@@ -113,7 +113,7 @@ export const MEALS: Meal[] = [
     image: img("1467003909585-2f8a72700288"),
     minutes: 25,
     servings: 4,
-    tags: ["fish", "quick"],
+    tags: ["fish", "quick", "summery", "fresh", "light"],
     nutrition: { kcal: 610, protein: 40, carbs: 52, fat: 24 },
     ingredients: [
       { name: "Salmon fillets", qty: 4, unit: "unit", scalable: true },
@@ -130,7 +130,7 @@ export const MEALS: Meal[] = [
     image: img("1618040996337-56904b7850b9"),
     minutes: 20,
     servings: 4,
-    tags: ["veggie", "quick", "kids"],
+    tags: ["veggie", "quick", "kids", "bbq", "summery"],
     nutrition: { kcal: 520, protein: 22, carbs: 58, fat: 20 },
     ingredients: [
       { name: "Tortillas", qty: 8, unit: "unit", scalable: true },
@@ -156,6 +156,22 @@ export const SHOP_PERSONA = {
   emoji: "🧑‍🍳",
   label: "The Confident Home Cook",
   line: "You shop like someone who genuinely enjoys feeding people well.",
+};
+
+// Mock weather + season + event context we (pretend to) fetch to inspire the
+// week's meals. A real integration would populate `weather` from a weather API
+// and `event` from a holidays/events API; season can be derived from the date.
+// `themeTags` is the set of meal tags this context favours — the join point
+// the ranking scores against.
+export const CONTEXT: SuggestionContext = {
+  weather: { condition: "sunny", tempC: 26, emoji: "☀️", descriptor: "hot & bright" },
+  season: "summer",
+  event: {
+    name: "August Bank Holiday",
+    emoji: "🎉",
+    blurb: "A long weekend of sunshine — perfect for firing up the barbecue.",
+  },
+  themeTags: ["fresh", "light", "fish", "quick", "bbq", "summery"],
 };
 
 // The single deduped list of things you buy regularly, detected from past

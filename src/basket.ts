@@ -21,14 +21,14 @@ export function buildBasket(plan: PlanState): BasketLine[] {
     }
   }
 
-  for (const e of plan.essentials) {
-    if (!e.selected) continue;
+  for (const r of plan.regulars) {
+    if (!r.selected) continue;
     lines.push({
-      id: e.id,
-      name: e.name,
+      id: r.id,
+      name: r.name,
       qty: "1",
-      source: "essential",
-      sourceLabel: e.category,
+      source: "regular",
+      sourceLabel: r.category,
     });
   }
 

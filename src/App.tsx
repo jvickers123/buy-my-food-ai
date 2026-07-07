@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { ESSENTIALS } from "./data";
+import { REGULARS } from "./data";
 import type { PlanState } from "./types";
 import {
   Welcome,
   Upload,
+  ShopProfile,
   HouseholdScreen,
   Swipe,
-  Essentials,
+  Regulars,
   Calendar,
   Chat,
   Order,
@@ -16,13 +17,14 @@ const initialPlan: PlanState = {
   household: { adults: 2, children: 0, dietNotes: "" },
   receiptUploaded: false,
   acceptedMealIds: [],
-  essentials: ESSENTIALS.map((e) => ({ ...e })),
   nights: [],
   chat: [],
+  regulars: REGULARS.map((r) => ({ ...r })),
 };
 
 // Ordered flow. Welcome is step 0 and sits outside the progress bar count.
-const STEPS = [Welcome, Upload, HouseholdScreen, Swipe, Essentials, Calendar, Chat, Order];
+// ShopProfile (the delight screen) sits right after Upload.
+const STEPS = [Welcome, Upload, ShopProfile, HouseholdScreen, Swipe, Regulars, Calendar, Chat, Order];
 
 export default function App() {
   const [step, setStep] = useState(0);
@@ -30,6 +32,7 @@ export default function App() {
 
   const setPlan = (updater: (p: PlanState) => PlanState) => setPlanState((p) => updater(p));
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  const skip = () => setStep((s) => Math.min(s + 2, STEPS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const Current = STEPS[step];
@@ -54,7 +57,7 @@ export default function App() {
           ‹ Back
         </button>
       )}
-      <Current plan={plan} setPlan={setPlan} next={next} />
+      <Current plan={plan} setPlan={setPlan} next={next} skip={skip} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { Meal, EssentialItem, CalendarNight } from "./types";
+import type { Meal, CalendarNight, ShopTrait, RegularItem } from "./types";
 
 // Mock meal deck. Photos are Unsplash source URLs (food photography) so the
 // cards read like Hello Fresh without shipping binary assets.
@@ -142,16 +142,45 @@ export const MEALS: Meal[] = [
   },
 ];
 
-// Essentials suggested from "past shopping" — pre-ticked where confidence is high.
-export const ESSENTIALS: EssentialItem[] = [
-  { id: "e1", name: "Toothpaste", category: "Household", reason: "Bought roughly monthly", selected: true },
-  { id: "e2", name: "Toilet paper (9 pack)", category: "Household", reason: "In every shop", selected: true },
-  { id: "e3", name: "Washing-up liquid", category: "Household", reason: "Bought every 3 weeks", selected: true },
-  { id: "e4", name: "Semi-skimmed milk (4pt)", category: "Cupboard staples", reason: "Weekly staple", selected: true },
-  { id: "e5", name: "Free-range eggs (12)", category: "Cupboard staples", reason: "Weekly staple", selected: true },
-  { id: "e6", name: "Butter", category: "Cupboard staples", reason: "Bought fortnightly", selected: false },
-  { id: "e7", name: "Bin bags", category: "Household", reason: "Bought monthly", selected: false },
-  { id: "e8", name: "Coffee beans", category: "Cupboard staples", reason: "Bought fortnightly", selected: false },
+// The "delight" profile — what a receipt says about you. All positive by
+// design: every trait is a flattering read of the same shopping data.
+export const SHOP_TRAITS: ShopTrait[] = [
+  { emoji: "🥦", title: "Healthy Eater", detail: "Fresh veg in every single shop — your trolley’s greener than most." },
+  { emoji: "🌍", title: "Adventurous Cook", detail: "Miso, chorizo, green curry paste… you’re not afraid of a global flavour." },
+  { emoji: "💷", title: "Savvy Shopper", detail: "A smart mix of own-brand staples and the odd treat. Nicely balanced." },
+  { emoji: "♻️", title: "Low-Waste Hero", detail: "You buy what you use — barely a repeat-buy of things left to spoil." },
+];
+
+// The headline personality — one big flattering label for the hero.
+export const SHOP_PERSONA = {
+  emoji: "🧑‍🍳",
+  label: "The Confident Home Cook",
+  line: "You shop like someone who genuinely enjoys feeding people well.",
+};
+
+// The single deduped list of things you buy regularly, detected from past
+// receipts. Grocery staples and household essentials live here together —
+// one concept, grouped by category. Pre-selected ones land in the basket;
+// the user can drop any. This replaces the old separate "essentials" list.
+export const REGULARS: RegularItem[] = [
+  // Fresh & dairy
+  { id: "r1", name: "Bananas", category: "Fresh & dairy", cadence: "Every shop", emoji: "🍌", selected: true },
+  { id: "r2", name: "Semi-skimmed milk (4pt)", category: "Fresh & dairy", cadence: "Every shop", emoji: "🥛", selected: true },
+  { id: "r3", name: "Free-range eggs (12)", category: "Fresh & dairy", cadence: "Every shop", emoji: "🥚", selected: true },
+  { id: "r5", name: "Greek yoghurt (1kg)", category: "Fresh & dairy", cadence: "Weekly", emoji: "🥣", selected: true },
+  { id: "r6", name: "Baby spinach", category: "Fresh & dairy", cadence: "Weekly", emoji: "🥬", selected: true },
+  { id: "r7", name: "Cheddar (mature)", category: "Fresh & dairy", cadence: "Fortnightly", emoji: "🧀", selected: true },
+  { id: "r11", name: "Butter", category: "Fresh & dairy", cadence: "Fortnightly", emoji: "🧈", selected: false },
+  // Cupboard staples
+  { id: "r4", name: "Sourdough loaf", category: "Cupboard staples", cadence: "Weekly", emoji: "🍞", selected: true },
+  { id: "r8", name: "Ground coffee", category: "Cupboard staples", cadence: "Fortnightly", emoji: "☕", selected: true },
+  { id: "r9", name: "Dark chocolate", category: "Cupboard staples", cadence: "Fortnightly", emoji: "🍫", selected: false },
+  { id: "r10", name: "Sparkling water (6pk)", category: "Cupboard staples", cadence: "Weekly", emoji: "💧", selected: false },
+  // Household
+  { id: "r12", name: "Toilet paper (9 pack)", category: "Household", cadence: "Every shop", emoji: "🧻", selected: true },
+  { id: "r13", name: "Toothpaste", category: "Household", cadence: "Monthly", emoji: "🪥", selected: true },
+  { id: "r14", name: "Washing-up liquid", category: "Household", cadence: "Every 3 weeks", emoji: "🧴", selected: false },
+  { id: "r15", name: "Bin bags", category: "Household", cadence: "Monthly", emoji: "🗑️", selected: false },
 ];
 
 // Mock Google Calendar read — one week, some nights out.
